@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<title>WTCoNY Map</title>		
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>	
+	
+	
+<style>
+	body {margin:0}
+	#map {position: absolute; height: 100%; width: 100%; z-index: -1;}
+	#circle-images {position: absolute; z-index: 1; margin: 6px 0 0 20px}
+	.row {float: left; clear: both}
+	#circle-images img {margin:10px 0 0 20px; filter: drop-shadow(0 0 3px grey)}
+</style>
+	
+</head>
+
+<body>
+<div id="circle-images">
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/8thStBlock.png" alt="8th St. Block Association" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/CitizenProjects.png" alt="Citizen Projects" width="30%">
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/ConeyIslandBeautificationProject.png" alt="Coney Island Beautification Project" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/LotusGarden.png" alt="Lotus Garden" width="30%">	
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/LUNGS.png" alt="LUNGS" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NaturalAreasConservancy.png" alt="Natural Areas Convservancy" width="30%">
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NewtonCreekAlliance.png" alt="Newton Creek Alliance" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NewYorkersForParks.png" alt="New Yorkers For Parks" width="30%">	
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NewYorkBotanicalGarden.png" alt="New York Botanical Garden" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/PromenadeGarden.png" alt="Promenade Garden Conservancy" width="30%">
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/ProtectorsofPineWoods.png" alt="Protectors of Pine Oak Woods" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/RandallsIslandParkAlliance.png" alt="Randall's Island Park Alliance" width="30%">
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/ThePoopProject.png" alt="The POOP Project" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/TroutUnlimited.png" alt="Trout Unlimited" width="30%">
+	</div>
+	<div class="row" width="400px">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/WarrenStCommunityGarden.png" alt="Warren St. Community Garden" width="30%">
+			<img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/WeRunBrownsville.png" alt="We Run Brownsville" width="30%">
+	</div>	
+</div>	
+<div id="map"></div>
+	
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3RzdWdhd2EiLCJhIjoiY2tibG9pbThnMWF5aDJybWwxa3hhcDBmayJ9.OYmyVq9IKYQFkN_svFVqyg';
+var map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/ktsugawa/ckfedhlol06a919n96db16tca',
+  center: [-74, 40.66],
+  zoom: 10.6
+});
+	
+map.on('load', function () {
+	map.loadImage(
+		'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+		// Add an image to use as a custom marker
+			function (error, image) {
+				if (error) throw error;
+				map.addImage('custom-marker', image);
+				
+function addDataToMap(data, map) {
+    var dataLayer = L.geoJson(data);
+    dataLayer.addTo(map);
+}
+$.getJSON("https://raw.githubusercontent.com/PrattSAVI/STEW_MAP/master/group_data/Groups.geojson", function(data) { 	addDataToMap(data, map); });
+ 
+// Add a layer showing the places.
+map.addLayer({
+'id': 'places',
+'type': 'symbol',
+'source': 'places',
+'layout': {
+'icon-image': 'custom-marker',
+'icon-allow-overlap': true
+}
+});
+}
+);
+ 
+// Create a popup, but don't add it to the map yet.
+var popup = new mapboxgl.Popup({
+	closeButton: false,
+	closeOnClick: false
+	});
+ 
+map.on('mouseenter', 'places', function (e) {
+// Change the cursor style as a UI indicator.
+	map.getCanvas().style.cursor = 'pointer';
+ 
+var coordinates = e.features[0].geometry.coordinates.slice();
+var description = e.features[0].properties.description;
+ 
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+}
+ 
+// Populate the popup and set its coordinates
+// based on the feature found.
+popup.setLngLat(coordinates).setHTML(description).addTo(map);
+});
+ 
+map.on('mouseleave', 'places', function () {
+map.getCanvas().style.cursor = '';
+popup.remove();
+});
+});
+</script>
+</body>	
+</html>
