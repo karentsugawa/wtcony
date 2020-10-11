@@ -8,6 +8,7 @@
 <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>	
+<script src="/js/leaflet-0.7.2/leaflet.ajax.min.js"></script>
 	
 	
 <style>
@@ -75,20 +76,15 @@ map.on('load', function () {
 				map.addImage('custom-marker', image);
 				
 function addDataToMap(data, map) {
-    var dataLayer = L.geoJson(data);
+    var dataLayer = new L.geojsonLayer("https://github.com/PrattSAVI/STEW_MAP/blob/master/group_data/Groups.geojson");
     dataLayer.addTo(map);
 }
-$.getJSON("https://raw.githubusercontent.com/PrattSAVI/STEW_MAP/master/group_data/Groups.geojson", function(data) { 	addDataToMap(data, map); });
  
 // Add a layer showing the places.
 map.addLayer({
 'id': 'places',
 'type': 'symbol',
 'source': 'places',
-'layout': {
-'icon-image': 'custom-marker',
-'icon-allow-overlap': true
-}
 });
 }
 );
