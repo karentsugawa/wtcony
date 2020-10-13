@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>WTCoNY Map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Assistant" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Assistant';
+            font-size: 22px;
+        }
+        
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            z-index: -1;
+        }
+        
+        #circle-images {
+            position: absolute;
+            z-index: 1;
+            margin: 6px 0 0 20px
+        }
+        
+        .row {
+            float: left;
+            clear: both
+        }
+        
+        #circle-images img {
+            margin: 10px 0 0 20px;
+            filter: drop-shadow(0 0 3px grey)
+        }
+        
+        #box {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background-color: rgb(249, 249, 249, 0.7);
+            width: 25%;
+            padding: 0 20px 0 20px;
+        }
+        
+        #replace_mission {
+            font-family: 'Assistant';
+            font-size: 14px;
+        }
+        
+        #replace_info {
+            font-family: 'Assistant';
+            font-size: 14px;
+        }
+        
+        hr {
+            border-top: 0.5px solid #565249;
+        }
+        
+        #image_circle {
+            opacity: 1;
+        }
+        
+        img {
+            width: 27%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="circle-images">
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/8thStBlock.png" alt="8th Street Block Association" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/CitizenProjects.png" alt="Citizen Projects" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/ConeyIslandBeautificationProject.png" alt="Coney Island Beautification Project, Inc." id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/LotusGarden.png" alt="Lotus Garden" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/LUNGS.png" alt="LUNGS (Loisaida United Neighborhood Gardens)" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NaturalAreasConservancy.png" alt="Natural Areas Conservancy" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NewtonCreekAlliance.png" alt="Newtown Creek Alliance" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NewYorkersForParks.png" alt="New Yorkers for Parks" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/NewYorkBotanicalGarden.png" alt="New York Botanical Garden" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/PromenadeGarden.png" alt="Promenade Garden Conservancy" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/ProtectorsofPineWoods.png" alt="Protectors of Pine Oak Woods" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/RandallsIslandParkAlliance.png" alt="Randall's Island Park Alliance" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/ThePoopProject.png" alt="The People's Own Organic Power (POOP) Project" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/TroutUnlimited.png" alt="Trout Unlimited - Trout in the Classroom" id='image_circle'>
+        </div>
+        <div class="row" width="400px">
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/WarrenStCommunityGarden.png" alt="Warren St. Marks Community Garden" id='image_circle'>
+            <img src="https://www.thenatureofcities.com/TNOC/wp-content/uploads/2020/10/WeRunBrownsville.png" alt="We Run Brownsville" id='image_circle'>
+        </div>
+    </div>
+    <div id="map"></div>
+    <div id="box">
+        <p id="replace_mission">Click on any photo on the left for more information about the organization.</p>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoia3RzdWdhd2EiLCJhIjoiY2tibG9pbThnMWF5aDJybWwxa3hhcDBmayJ9.OYmyVq9IKYQFkN_svFVqyg';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/ktsugawa/ckfedhlol06a919n96db16tca',
+            center: [-74, 40.66],
+            zoom: 10.6,
+            scrollWheelZoom: false // Disable zoom via scroll wheel
+        });
+
+        map.on('style.load', function() {
+
+            //It is better to bring in the data at once to var data, so we don't keep downloading it. 
+            d3.json('https://raw.githubusercontent.com/PrattSAVI/STEW_MAP/master/group_data/Groups.geojson',
+                function(err, data) {
+                    if (err) throw err;
+
+                    console.log('Data is loaded, Ready to go!'); //Notify me when the data is loaded
+                    //console.log(data);
+
+                    var cbo = 'Something'; //No groups will be selected
+
+                    function filterBy(cbo) { //Define filter for data
+                        var filters = ['==', 'OrgName', cbo];
+                        map.setFilter('groups', filters);
+
+                        for (var i = 0; i < data.features.length; i++) { // Get selected groups mission statement
+                            if (data.features[i].properties.OrgName === cbo) {
+                                selected_group = data.features[i] //Extract data and use for zoom
+                                selected_mission = selected_group.properties.Mission;
+                                selected_name = selected_group.properties.OrgName;
+                                selected_phone = selected_group.properties.OrgPhone;
+                                selected_email = selected_group.properties.OrgEmail;
+                                selected_website = selected_group.properties.OrgWebSite;
+                            };
+                        }
+                        document.getElementById('replace_mission').innerHTML = '<h4>' + selected_name + '</h4><hr><strong>Mission Statement: </strong><p id="replace_info">' + selected_mission + '<hr>' + selected_phone + '<br>' + selected_email + '<br>' + selected_website + '</p>';
+                        var bounds = turf.bbox(selected_group);
+                        map.fitBounds(bounds, { // zoom
+                            padding: 20
+                        });
+                    };
+
+                    $(document).on("click", "#map", function(event) {
+                        var elements = $('[id=image_circle]');
+                        for (var i = 0; i < elements.length; i++) {
+                            elements[i].style.opacity = 1;
+                        }
+                        map.setFilter('groups', null);
+                        var bounds = turf.bbox(data.features[5]); //5th is whole 5 boroughs
+                        map.fitBounds(bounds, { // zoom
+                            padding: 100
+                        });
+                        document.getElementById('replace_mission').innerHTML = 'Click on any photo on the left for more information about the organization.'
+                    })
+
+                    //I am sure there is a classier way of doing this, but I am getting the clicked groups name
+                    //using jquery from alt field. I'll use this to filter. 
+                    $(document).on("click", "#image_circle", function(event) { // Clicked alt is saved to var cbo
+                        console.log(event.target.alt);
+                        cbo = event.target.alt;
+
+                        // Change Opacity to unclicked cbos
+                        var elements = $('[id=image_circle]');
+                        for (var i = 0; i < elements.length; i++) {
+                            elements[i].style.opacity = 0.65;
+                        }
+                        event.target.style.opacity = 1; //Selected one is opaque
+                        filterBy(cbo);
+                    });
+
+                    //Define data as source layer
+                    map.addSource('groups', {
+                        'type': 'geojson',
+                        data: data
+                    });
+
+                    //Add it as a Layer
+                    map.addLayer({
+                        'id': 'groups',
+                        'source': 'groups',
+                        'type': 'line',
+                        'paint': { //Styling
+                            'line-color': '#f4a261',
+                            'line-opacity': 0.8,
+                            'line-width': 2,
+                        },
+                        'layout': {
+                            'line-join': 'round',
+                        }
+                    });
+
+                });
+        })
+    </script>
+</body>
+
+</html>
