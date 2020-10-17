@@ -148,11 +148,10 @@
                                 selected_group = data.features[i] //Extract data and use for zoom
                                 selected_mission = selected_group.properties.Mission;
                                 selected_name = selected_group.properties.OrgName;
-                                selected_email = selected_group.properties.OrgEmail;
                                 selected_website = selected_group.properties.OrgWebSite;
                             };
                         }
-                        document.getElementById('replace_mission').innerHTML = '<h4>' + selected_name + '</h4><hr><strong>Mission Statement: </strong><p id="replace_info">' + selected_mission + '<hr>' + selected_phone + '<br>' + selected_email + '<br>' + selected_website + '</p>';
+                        document.getElementById('replace_mission').innerHTML = '<h4>' + selected_name + '</h4><hr><strong>Mission Statement: </strong><p id="replace_info">' + selected_mission + '<hr>' + selected_website + '</p>';
                         var bounds = turf.bbox(selected_group);
                         map.fitBounds(bounds, { // zoom
                             padding: 20
