@@ -3,7 +3,7 @@
 
 <head>
     <title>WTCoNY Map</title>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
@@ -32,14 +32,17 @@
             z-index: 1;
             margin: 6px 0 0 20px;
         }
-        #circle-images img{
+        
+        #circle-images img {
             border-radius: 100%;
             border: 3px solid transparent;
         }
+        
         #circle-images img:hover {
             border-radius: 100%;
             border: 3px solid #ffffff;
         }
+        
         .row {
             float: left;
             clear: both
@@ -49,9 +52,11 @@
             margin: 5px 0 0 15px;
             filter: drop-shadow(0 0 3px grey)
         }
-        a.#circle_images img { 
-            cursor: pointer; 
+        
+        a.#circle_images img {
+            cursor: pointer;
         }
+        
         #box {
             position: absolute;
             top: 25px;
@@ -143,9 +148,7 @@
                 function(err, data) {
                     if (err) throw err;
 
-                    console.log('Data is loaded, Ready to go!'); //Notify me when the data is loaded
-                    //console.log(data);
-
+                    //console.log('Data is loaded, Ready to go!'); //Notify me when the data is loaded
                     var cbo = 'Something'; //No groups will be selected
 
                     function filterBy(cbo) { //Define filter for data
@@ -155,12 +158,13 @@
                         for (var i = 0; i < data.features.length; i++) { // Get selected groups mission statement
                             if (data.features[i].properties.OrgName === cbo) {
                                 selected_group = data.features[i] //Extract data and use for zoom
-                                selected_mission = selected_group.properties.Mission;
+                                selected_mission = selected_group.properties.quote; //Not mission but quote
                                 selected_name = selected_group.properties.OrgName;
                                 selected_website = selected_group.properties.OrgWebSite;
+                                selected_who = selected_group.properties.who
                             };
                         }
-                        document.getElementById('replace_mission').innerHTML = '<h4>' + selected_name + '</h4><hr><strong>Mission Statement: </strong><p id="replace_info">' + selected_mission + '<hr>' + selected_website + '</p>';
+                        document.getElementById('replace_mission').innerHTML = '<h4>' + selected_name + '</h4><hr><p id="replace_info">' + selected_mission + '<br><br><i>-' + selected_who + '</i><hr>' + selected_website + '</p>';
                         var bounds = turf.bbox(selected_group);
                         map.fitBounds(bounds, { // zoom
                             padding: 20
@@ -173,15 +177,13 @@
                             elements[i].style.opacity = 1;
                         }
                         map.setFilter('groups', null);
-                        var bounds = turf.bbox(data.features[5]); //5th is whole 5 boroughs
+                        var bounds = turf.bbox(data.features[7]); //5th is whole 5 boroughs
                         map.fitBounds(bounds, { // zoom
                             padding: 100
                         });
                         document.getElementById('replace_mission').innerHTML = 'Click on any photo on the left for more information about the organization.'
                     })
 
-                    //I am sure there is a classier way of doing this, but I am getting the clicked groups name
-                    //using jquery from alt field. I'll use this to filter. 
                     $(document).on("click", "#image_circle", function(event) { // Clicked alt is saved to var cbo
                         console.log(event.target.alt);
                         cbo = event.target.alt;
